@@ -1,58 +1,57 @@
 // pages/api/submit.js
 
 export default async function handler(req, res) {
-  // HTTPメソッドがPOST以外の場合はエラーを返す
+  // POSTメソッド以外は拒否
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "許可されていないメソッドです" });
+    return res.status(405).json({ message: "許可されていないメソッドです。" });
   }
 
-  // リクエストボディからニックネームと好きなゲームを取得
+  // リクエストボディから入力値を取得
   const { name, game } = req.body || {};
 
-  // 必須項目が入力されていない場合はエラーを返す
+  // 必須チェック
   if (!name || !game) {
-    return res.status(400).json({ message: "ニックネームと好きなゲームの両方を入力してください。" });
+    return res.status(400).json({ message: "回答を入力してください！" });
   }
 
-  // Discord WebhookのURLを環境変数から取得
+  // Discord Webhook URLを環境変数から取得
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
 
-  // Webhook URLが設定されていない場合はサーバーエラーを返す
+  // Webhook URL未設定時のエラーハンドリング
   if (!webhookUrl) {
-    console.error("DISCORD_WEBHOOK_URLが環境変数に設定されていません。");
-    // ここを更新しました
+    console.error("[ERROR] DISCORD_WEBHOOK_URLが未設定です。");
     return res.status(500).json({
-      message: "サーバー設定エラーが発生しました。管理者にお問い合わせください: https://otoiawase-gon.vercel.app/contact"
+      message:
+        "問題があるようです、ここから連絡してください: https://otoiawase-gon.vercel.app/contact",
     });
   }
 
-  // Discordに送信するペイロードを準備
+  // Discordへ送信するメッセージ内容
   const discordPayload = {
-    content: `新しいアンケート回答が届きました！\n\n**ニックネーム**: ${name}\n**好きなゲーム**: ${game}`,
+    content: ` 新しいアンケート回答が届きました！ \n\n**ニックネーム**: ${name}\n**好きなゲーム**: ${game}`,
   };
 
   try {
-    // Discord Webhookにデータを送信
+    // WebhookへPOST送信
     const response = await fetch(webhookUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(discordPayload),
     });
 
-    // Discordからのレスポンスが成功（2xx系、またはDiscord特有の204 No Content）でなければエラーをスロー
+    // Discordが成功応答を返さなかった場合の処理
     if (!response.ok && response.status !== 204) {
-      const errorText = await response.text(); // Discordからのエラー詳細を取得
-      console.error(`Discord Webhookからのエラー: ${response.status} - ${errorText}`);
+      const errorText = await response.text();
+      console.error(`[ERROR] Discord Webhookエラー: ${response.status} - ${errorText}`);
       throw new Error("Discordへのメッセージ送信に失敗しました。");
     }
 
     // 成功レスポンスを返す
-    res.status(200).json({ message: "アンケート回答を送信しました！" });
+    res.status(200).json({ message: "アンケート回答を正常に送信しました！" });
   } catch (error) {
-    // 送信中にエラーが発生した場合
-    console.error("アンケート回答の送信中にエラーが発生しました:", error);
-    res.status(500).json({ message: "回答の送信中に予期せぬエラーが発生しました。時間を置いて再度お試しください。" });
+    console.error("[ERROR] アンケート回答送信中の例外:", error);
+    res.status(500).json({
+      message: "送信中にエラーが発生しました。時間をおいて再度お試しください。",
+    });
   }
 }
