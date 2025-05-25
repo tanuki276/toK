@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Head from 'next/head';
-import { FiSend, FiXCircle, FiUser, FiGamepad, FiLoader } from 'react-icons/fa';
+import { FiSend, FiXCircle, FiUser, FiGamepad, FiLoader } from 'react-icons/fi';
 
 export default function Home() {
   const [name, setName] = useState('');
