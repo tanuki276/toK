@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import Head from 'next/head';
-import { FiSend, FiXCircle } from 'react-icons/fi'; // 送信とエラーのアイコンをインポート
+import { FiSend, FiXCircle, FiUser, FiGamepad, FiLoader } from 'react-icons/fi';
 
 export default function Home() {
   const [name, setName] = useState('');
   const [game, setGame] = useState('');
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState(false); // エラーハンドリングのための新しいstate
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false); // 追加：送信中のローディング
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(false); // 送信前にエラー状態をリセット
+    setError(false);
+    setLoading(true);
     try {
       const response = await fetch('/api/submit', {
         method: 'POST',
@@ -19,18 +21,19 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        // HTTPステータスが2xx以外の場合
-        const errorData = await response.json(); // エラーレスポンスを解析
+        const errorData = await response.json();
         throw new Error(errorData.message || 'フォーム送信に失敗しました。');
       }
       setSent(true);
-      setError(false); // 成功したらエラーをクリア
-      setName(''); // フォームをクリア
-      setGame(''); // フォームをクリア
+      setError(false);
+      setName('');
+      setGame('');
     } catch (err) {
       console.error('送信エラー:', err);
-      setError(true); // エラー状態をtrueに設定
-      setSent(false); // エラー時は送信済みではない
+      setError(true);
+      setSent(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,27 +54,37 @@ export default function Home() {
         ) : (
           <form onSubmit={handleSubmit}>
             <label>
-              ニックネーム
+              <FiUser className="label-icon" /> ニックネーム
               <input
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 required
+                disabled={loading}
               />
             </label>
 
             <label>
-              好きなゲーム
+              <FiGamepad className="label-icon" /> 好きなゲーム
               <input
                 type="text"
                 value={game}
                 onChange={e => setGame(e.target.value)}
                 required
+                disabled={loading}
               />
             </label>
 
-            <button type="submit">
-              <FiSend className="button-icon" /> 送信
+            <button type="submit" disabled={loading}>
+              {loading ? (
+                <>
+                  <FiLoader className="button-icon spinning" /> 送信中...
+                </>
+              ) : (
+                <>
+                  <FiSend className="button-icon" /> 送信
+                </>
+              )}
             </button>
           </form>
         )}
@@ -87,9 +100,9 @@ export default function Home() {
         body {
           margin: 0;
           padding: 0;
-          font-family: 'Inter', 'Segoe UI', sans-serif; /* モダンなフォント */
-          background: linear-gradient(135deg, #0a192f 0%, #172a45 100%); /* 暗いグラデーション背景 */
-          color: #e2e8f0; /* コントラストのための明るいテキスト */
+          font-family: 'Inter', 'Segoe UI', sans-serif;
+          background: linear-gradient(135deg, #000000 0%, #001f4d 100%);
+          color: #cfd8dc;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -97,81 +110,93 @@ export default function Home() {
         }
 
         .container {
-          max-width: 420px; /* 少し広げてモダンな感じに */
-          width: 90%; /* レスポンシブな幅 */
-          background: rgba(255, 255, 255, 0.08); /* 半透明の白 */
-          backdrop-filter: blur(10px); /* すりガラス効果 */
+          max-width: 420px;
+          width: 90%;
+          background: rgba(20, 30, 50, 0.85);
           padding: 2.5rem;
           border-radius: 16px;
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); /* 強く拡散した影 */
-          border: 1px solid rgba(255, 255, 255, 0.1); /* 微妙な境界線 */
+          box-shadow: 0 8px 20px rgba(0, 31, 77, 0.7);
+          border: 1px solid rgba(100, 150, 250, 0.2);
         }
 
         h1 {
           font-size: 1.8rem;
           margin-bottom: 2rem;
           text-align: center;
-          color: #8be9fd; /* 見出し用のアクアブルー */
-          text-shadow: 0 0 10px rgba(139, 233, 253, 0.5);
+          color: #58a6ff;
+          text-shadow: 0 0 6px rgba(88, 166, 255, 0.7);
         }
 
         label {
-          display: block;
+          display: flex;
+          align-items: center;
           margin-bottom: 1.2rem;
           font-weight: 500;
-          color: #a6adbb; /* 少し彩度を落としたテキスト */
+          color: #a6b8d7;
           font-size: 0.95rem;
+          gap: 0.6rem;
+        }
+
+        .label-icon {
+          font-size: 1.2rem;
+          color: #58a6ff;
+          flex-shrink: 0;
         }
 
         input {
-          width: calc(100% - 1.5rem); /* パディングを考慮して調整 */
+          flex-grow: 1;
           padding: 0.8rem 0.75rem;
-          margin-top: 0.4rem;
-          background: rgba(255, 255, 255, 0.05); /* 非常に微妙な背景 */
-          border: 1px solid rgba(139, 233, 253, 0.3); /* アクア色の境界線 */
+          margin-left: 0.4rem;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(88, 166, 255, 0.4);
           border-radius: 10px;
           outline: none;
-          color: #e2e8f0; /* 入力テキストの色 */
+          color: #cfd8dc;
           transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         input:focus {
-          border-color: #00bcd4; /* フォーカス時に明るいアクア */
-          box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.3); /* グロー効果 */
+          border-color: #58a6ff;
+          box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
         }
 
         button {
           width: 100%;
           padding: 0.9rem;
-          background: linear-gradient(45deg, #007bff, #00bcd4); /* 青からアクアへのグラデーション */
+          background: linear-gradient(45deg, #003366, #0055aa);
           color: white;
           border: none;
           border-radius: 10px;
           font-weight: bold;
           cursor: pointer;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 0.6rem; /* アイコンとテキストの間隔 */
+          gap: 0.6rem;
           font-size: 1.05rem;
-          box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+          box-shadow: 0 4px 15px rgba(0, 85, 170, 0.4);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+          box-shadow: 0 6px 20px rgba(0, 85, 170, 0.6);
         }
 
-        button:active {
+        button:active:not(:disabled) {
           transform: translateY(0);
-          box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2);
+          box-shadow: 0 2px 10px rgba(0, 85, 170, 0.3);
+        }
+
+        button:disabled {
+          cursor: not-allowed;
+          opacity: 0.7;
         }
 
         .thanks {
           text-align: center;
           font-size: 1.2rem;
-          color: #38c172; /* 成功時の緑色 */
+          color: #38c172;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -182,7 +207,7 @@ export default function Home() {
         .error-message {
           text-align: center;
           font-size: 1rem;
-          color: #e3342f; /* エラー時の赤色 */
+          color: #e3342f;
           margin-top: 1.5rem;
           display: flex;
           justify-content: center;
@@ -195,15 +220,24 @@ export default function Home() {
         }
 
         .send-icon {
-          color: #38c172; /* 送信アイコンの緑色 */
+          color: #38c172;
         }
 
         .error-icon {
-          color: #e3342f; /* エラーアイコンの赤色 */
+          color: #e3342f;
         }
 
         .button-icon {
-            font-size: 1.1rem;
+          font-size: 1.1rem;
+        }
+
+        .spinning {
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </>
