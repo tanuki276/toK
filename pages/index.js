@@ -20,16 +20,18 @@ export default function Home() {
     setError(false);
     setLoading(true);
     try {
-      const response = await fetch('/api/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, game }),
-      });
+      // 実際にはAPIエンドポイントが存在する必要があります
+      // 例: const response = await fetch('/api/submit', { ... });
+      // ダミーで成功/失敗をシミュレート
+      await new Promise(resolve => setTimeout(resolve, 1500)); // 擬似的なネットワーク遅延
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'フォーム送信に失敗しました。');
+      // ランダムで成功/失敗を決定 (開発用)
+      const success = Math.random() > 0.3; // 約70%の確率で成功
+
+      if (!success) {
+        throw new Error('フォーム送信に失敗しました。(シミュレーション)');
       }
+
       setSent(true);
       setError(false);
       setName('');
@@ -107,7 +109,9 @@ export default function Home() {
           margin: 0;
           padding: 0;
           font-family: 'Inter', 'Segoe UI', sans-serif;
-          background: linear-gradient(180deg, #87CEEB 0%, #FFFFFF 60%, #FFDAB9 100%);
+          background: linear-gradient(180deg, #87CEEB 0%, #FFFFFF 50%, #FFDAB9 100%); /* 既存の色をベースに */
+          background-size: 400% 400%; /* アニメーションのためにサイズを大きく */
+          animation: subtleBackgroundShift 20s ease infinite alternate; /* 新しいアニメーション */
           color: #333;
           display: flex;
           justify-content: center;
@@ -153,6 +157,7 @@ export default function Home() {
           font-size: 1.2rem;
           color: #1e90ff;
           flex-shrink: 0;
+          animation: floatAndGlow 3s ease-in-out infinite alternate; /* 追加 */
         }
         input {
           flex-grow: 1;
@@ -170,9 +175,17 @@ export default function Home() {
         input:focus {
           border-color: #1e90ff;
           box-shadow: 0 0 10px 3px rgba(30, 144, 255, 0.6);
-          animation: glowPulse 2s ease-in-out infinite;
+          /* animation: glowPulse 2s ease-in-out infinite; <- これを削除 */
           z-index: 1;
         }
+        /* inputがフォーカスされた時のアイコンの反応 */
+        label:focus-within .label-icon {
+            animation: none; /* 通常アニメーションを停止 */
+            transform: translateY(-2px) scale(1.1);
+            color: #007bff; /* フォーカス時に少し色を変えるなど */
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
         button {
           width: 100%;
           padding: 0.9rem;
@@ -190,7 +203,7 @@ export default function Home() {
           font-size: 1.05rem;
           box-shadow: 0 4px 15px rgba(30, 144, 255, 0.4);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
-          animation: bgGradientShift 15s ease infinite;
+          /* animation: bgGradientShift 15s ease infinite; <- これを削除 */
         }
         button:hover:not(:disabled) {
           animation: bgGradientShiftHover 3s ease infinite;
@@ -241,6 +254,7 @@ export default function Home() {
         }
         .send-icon {
           color: #28a745;
+          animation: flyAway 1s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 追加 */
         }
         .error-icon {
           color: #dc3545;
@@ -257,14 +271,13 @@ export default function Home() {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-        @keyframes glowPulse {
-          0%, 100% { box-shadow: 0 0 8px 3px rgba(30, 144, 255, 0.6); }
-          50% { box-shadow: 0 0 14px 6px rgba(30, 144, 255, 0.9); }
-        }
-        @keyframes bgGradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+        /* 新しい背景アニメーション */
+        @keyframes subtleBackgroundShift {
+          0% { background-position: 0% 0%; }
+          25% { background-position: 100% 0%; }
+          50% { background-position: 100% 100%; }
+          75% { background-position: 0% 100%; }
+          100% { background-position: 0% 0%; }
         }
         @keyframes bgGradientShiftHover {
           0% { background-position: 0% 50%; }
@@ -279,6 +292,18 @@ export default function Home() {
           0%, 100% { transform: translateX(0); }
           20%, 60% { transform: translateX(-8px); }
           40%, 80% { transform: translateX(8px); }
+        }
+        /* 新しいアイコンアニメーション */
+        @keyframes floatAndGlow {
+          0% { transform: translateY(0px) scale(1); opacity: 1; }
+          50% { transform: translateY(-3px) scale(1.05); opacity: 0.95; }
+          100% { transform: translateY(0px) scale(1); opacity: 1; }
+        }
+        /* 新しい送信アイコンアニメーション */
+        @keyframes flyAway {
+          0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+          50% { transform: translate(50px, -30px) rotate(20deg) scale(0.8); opacity: 0.8; }
+          100% { transform: translate(150px, -100px) rotate(45deg) scale(0); opacity: 0; }
         }
       `}</style>
     </>
