@@ -97,67 +97,68 @@ export default function Home() {
       </div>
 
       <style jsx>{`
-        /* ここは変更なし */
         body {
           margin: 0;
           padding: 0;
           font-family: 'Inter', 'Segoe UI', sans-serif;
-          background: linear-gradient(135deg, #000000 0%, #001f4d 100%);
-          color: #cfd8dc;
+          background: linear-gradient(180deg, #87CEEB 0%, #FFFFFF 60%, #FFDAB9 100%);
+          color: #333;
           display: flex;
           justify-content: center;
-          align-items: center;
+          align-items: flex-start;
           min-height: 100vh;
+          padding-top: 80px;
         }
         .container {
           max-width: 420px;
           width: 90%;
-          background: rgba(20, 30, 50, 0.85);
+          background: rgba(255, 255, 255, 0.9);
           padding: 2.5rem;
           border-radius: 16px;
-          box-shadow: 0 8px 20px rgba(0, 31, 77, 0.7);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
           border: 1px solid rgba(100, 150, 250, 0.2);
+          color: #333;
         }
         h1 {
           font-size: 1.8rem;
           margin-bottom: 2rem;
           text-align: center;
-          color: #58a6ff;
-          text-shadow: 0 0 6px rgba(88, 166, 255, 0.7);
+          color: #1e90ff;
+          text-shadow: 0 0 6px rgba(30, 144, 255, 0.5);
         }
         label {
           display: flex;
           align-items: center;
           margin-bottom: 1.2rem;
           font-weight: 500;
-          color: #a6b8d7;
+          color: #555;
           font-size: 0.95rem;
           gap: 0.6rem;
         }
         .label-icon {
           font-size: 1.2rem;
-          color: #58a6ff;
+          color: #1e90ff;
           flex-shrink: 0;
         }
         input {
           flex-grow: 1;
           padding: 0.8rem 0.75rem;
           margin-left: 0.4rem;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(88, 166, 255, 0.4);
+          background: rgba(255, 255, 255, 0.85);
+          border: 1px solid rgba(30, 144, 255, 0.5);
           border-radius: 10px;
           outline: none;
-          color: #cfd8dc;
+          color: #333;
           transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         input:focus {
-          border-color: #58a6ff;
-          box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+          border-color: #1e90ff;
+          box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.3);
         }
         button {
           width: 100%;
           padding: 0.9rem;
-          background: linear-gradient(45deg, #003366, #0055aa);
+          background: linear-gradient(45deg, #1e90ff, #0055aa);
           color: white;
           border: none;
           border-radius: 10px;
@@ -168,16 +169,16 @@ export default function Home() {
           align-items: center;
           gap: 0.6rem;
           font-size: 1.05rem;
-          box-shadow: 0 4px 15px rgba(0, 85, 170, 0.4);
+          box-shadow: 0 4px 15px rgba(30, 144, 255, 0.4);
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         button:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(0, 85, 170, 0.6);
+          box-shadow: 0 6px 20px rgba(30, 144, 255, 0.6);
         }
         button:active:not(:disabled) {
           transform: translateY(0);
-          box-shadow: 0 2px 10px rgba(0, 85, 170, 0.3);
+          box-shadow: 0 2px 10px rgba(30, 144, 255, 0.3);
         }
         button:disabled {
           cursor: not-allowed;
@@ -186,7 +187,7 @@ export default function Home() {
         .thanks {
           text-align: center;
           font-size: 1.2rem;
-          color: #38c172;
+          color: #28a745;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -196,7 +197,7 @@ export default function Home() {
         .error-message {
           text-align: center;
           font-size: 1rem;
-          color: #e3342f;
+          color: #dc3545;
           margin-top: 1.5rem;
           display: flex;
           justify-content: center;
@@ -207,10 +208,10 @@ export default function Home() {
           font-size: 1.4rem;
         }
         .send-icon {
-          color: #38c172;
+          color: #28a745;
         }
         .error-icon {
-          color: #e3342f;
+          color: #dc3545;
         }
         .button-icon {
           font-size: 1.1rem;
