@@ -19,17 +19,27 @@ export default function Home() {
     e.preventDefault();
     setError(false);
     setLoading(true);
+
+    // しゅうせいてん
+    if (!name.trim() || !game.trim()) {
+      setError(true);
+      setLoading(false);
+      // alert('ニックネームと好きなゲームは必須です。');
+      return; // 空白の場合はここで処理を中断
+    }
+    // ★ここまで修正箇所です。
+
     try {
-      // 実際にはAPIエンドポイントが存在する必要があります
-      // 例: const response = await fetch('/api/submit', { ... });
-      // ダミーで成功/失敗をシミュレート
-      await new Promise(resolve => setTimeout(resolve, 1500)); // 擬似的なネットワーク遅延
+      // 実際のAPIエンドポイントへのfetch呼び出しを有効化
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, game }),
+      });
 
-      // ランダムで成功/失敗を決定 (開発用)
-      const success = Math.random() > 0.3; // 約70%の確率で成功
-
-      if (!success) {
-        throw new Error('フォーム送信に失敗しました。(シミュレーション)');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'フォーム送信に失敗しました。');
       }
 
       setSent(true);
@@ -175,7 +185,6 @@ export default function Home() {
         input:focus {
           border-color: #1e90ff;
           box-shadow: 0 0 10px 3px rgba(30, 144, 255, 0.6);
-          /* animation: glowPulse 2s ease-in-out infinite; <- これを削除 */
           z-index: 1;
         }
         /* inputがフォーカスされた時のアイコンの反応 */
@@ -203,7 +212,6 @@ export default function Home() {
           font-size: 1.05rem;
           box-shadow: 0 4px 15px rgba(30, 144, 255, 0.4);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
-          /* animation: bgGradientShift 15s ease infinite; <- これを削除 */
         }
         button:hover:not(:disabled) {
           animation: bgGradientShiftHover 3s ease infinite;
