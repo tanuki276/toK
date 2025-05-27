@@ -7,8 +7,10 @@ export default function Home() {
   const [game, setGame] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // 新しいState: エラーメッセージを保持
   const [loading, setLoading] = useState(false);
   const [animateForm, setAnimateForm] = useState(false);
+  const [inputError, setInputError] = useState({ name: false, game: false }); // 新しいState: 入力フィールドごとのエラー
 
   useEffect(() => {
     // ページロード時にフォーム表示アニメーション
@@ -18,19 +20,28 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(false);
+    setErrorMessage(''); // エラーメッセージをリセット
+    setInputError({ name: false, game: false }); // 入力エラーをリセット
     setLoading(true);
 
-    // しゅうせいてん
-    if (!name.trim() || !game.trim()) {
-      setError(true);
-      setLoading(false);
-      // alert('ニックネームと好きなゲームは必須です。');
-      return; // 空白の場合はここで処理を中断
+    let hasClientError = false;
+    if (!name.trim()) {
+      setInputError(prev => ({ ...prev, name: true }));
+      hasClientError = true;
     }
-    // ★ここまで修正箇所です。
+    if (!game.trim()) {
+      setInputError(prev => ({ ...prev, game: true }));
+      hasClientError = true;
+    }
+
+    if (hasClientError) {
+      setError(true);
+      setErrorMessage('ニックネームと好きなゲームは必須です。');
+      setLoading(false);
+      return;
+    }
 
     try {
-      // 実際のAPIエンドポイントへのfetch呼び出しを有効化
       const response = await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -44,11 +55,28 @@ export default function Home() {
 
       setSent(true);
       setError(false);
+      setErrorMessage('');
       setName('');
       setGame('');
     } catch (err) {
       console.error('送信エラー:', err);
       setError(true);
+      // APIから返された具体的なエラーメッセージを使用
+      setErrorMessage(err.message || '送信中にエラーが発生しました。時間をおいて再度お試しください。');
+
+      // エラーメッセージに応じて入力フィールドのエラーをハイライト
+      if (err.message.includes('回答を入力してください') || err.message.includes('必須')) {
+        if (!name.trim()) setInputError(prev => ({ ...prev, name: true }));
+        if (!game.trim()) setInputError(prev => ({ ...prev, game: true }));
+      }
+      if (err.message.includes('10文字以内')) {
+        if (name.length > 10) setInputError(prev => ({ ...prev, name: true }));
+        if (game.length > 10) setInputError(prev => ({ ...prev, game: true }));
+      }
+      if (err.message.includes('リンク')) {
+        setInputError({ name: true, game: true }); // 両方エラーにするか、具体的なフィールドを特定
+      }
+
       setSent(false);
     } finally {
       setLoading(false);
@@ -76,9 +104,10 @@ export default function Home() {
               <input
                 type="text"
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={e => { setName(e.target.value); setInputError(prev => ({ ...prev, name: false })); }}
                 required
                 disabled={loading}
+                className={inputError.name ? 'input-error' : ''} // エラークラスを適用
               />
             </label>
 
@@ -87,9 +116,10 @@ export default function Home() {
               <input
                 type="text"
                 value={game}
-                onChange={e => setGame(e.target.value)}
+                onChange={e => { setGame(e.target.value); setInputError(prev => ({ ...prev, game: false })); }}
                 required
                 disabled={loading}
+                className={inputError.game ? 'input-error' : ''} // エラークラスを適用
               />
             </label>
 
@@ -107,9 +137,9 @@ export default function Home() {
           </form>
         )}
 
-        {error && (
+        {error && errorMessage && ( // エラーメッセージが存在する場合のみ表示
           <p className="error-message">
-            <MdCancel className="icon error-icon" /> 送信に失敗しました。入力内容を確認し、もう一度お試しください。
+            <MdCancel className="icon error-icon" /> {errorMessage}
           </p>
         )}
       </div>
@@ -141,7 +171,7 @@ export default function Home() {
           color: #333;
           opacity: 0;
           transform: translateY(30px);
-          transition: opacity 0.7s ease, transform 0.7s ease;
+          transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* アニメーション調整 */
         }
         .container.animate-in {
           opacity: 1;
@@ -195,6 +225,13 @@ export default function Home() {
             transition: transform 0.2s ease, color 0.2s ease;
         }
 
+        /* 入力エラー時のスタイル */
+        .input-error {
+          border-color: #dc3545; /* 赤いボーダー */
+          box-shadow: 0 0 8px 2px rgba(220, 53, 69, 0.5); /* 赤いシャドウ */
+          animation: inputShake 0.3s ease; /* 揺れるアニメーション */
+        }
+
         button {
           width: 100%;
           padding: 0.9rem;
@@ -214,7 +251,7 @@ export default function Home() {
           transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         button:hover:not(:disabled) {
-          animation: bgGradientShiftHover 3s ease infinite;
+          animation: bgGradientShiftHover 4s ease infinite; /* アニメーション速度調整 */
           transform: scale(1.07);
           box-shadow: 0 8px 25px rgba(30, 144, 255, 0.7);
         }
@@ -312,6 +349,13 @@ export default function Home() {
           0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
           50% { transform: translate(50px, -30px) rotate(20deg) scale(0.8); opacity: 0.8; }
           100% { transform: translate(150px, -100px) rotate(45deg) scale(0); opacity: 0; }
+        }
+        /* 入力エラー時の揺れるアニメーション */
+        @keyframes inputShake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-3px); }
+          50% { transform: translateX(3px); }
+          75% { transform: translateX(-3px); }
         }
       `}</style>
     </>
