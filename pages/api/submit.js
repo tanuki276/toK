@@ -32,7 +32,7 @@ export default async function handler(req, res) {
   }
 
   const discordPayload = {
-    content: ` 新しいアンケート回答が届きました！ \n\n**ニックネーム**: ${name}\n**好きなゲーム**: ${game}`,
+    content: ` 新しいアンケート回答が届きました \n\n**ニックネーム**: ${name}\n**好きなゲーム**: ${game}`,
   };
 
   try {
