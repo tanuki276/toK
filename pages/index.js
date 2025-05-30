@@ -7,10 +7,10 @@ export default function Home() {
   const [game, setGame] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(''); // 新しいState: エラーメッセージを保持
+  const [errorMessage, setErrorMessage] = useState(''); // エラーメッセージを保持
   const [loading, setLoading] = useState(false);
   const [animateForm, setAnimateForm] = useState(false);
-  const [inputError, setInputError] = useState({ name: false, game: false }); // 新しいState: 入力フィールドごとのエラー
+  const [inputError, setInputError] = useState({ name: false, game: false }); // 入力フィールドごとのエラー
 
   useEffect(() => {
     // ページロード時にフォーム表示アニメーション
@@ -88,6 +88,9 @@ export default function Home() {
       <Head>
         <title>アンケート</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* ファビコン設定 */}
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon16x16.png" />
+        {/* ふぁびこ */}
       </Head>
 
       <div className={`container ${animateForm ? 'animate-in' : ''}`}>
